@@ -82,3 +82,15 @@ router.get('/notas/:id?', async ({ request, params }) => {
     return getNotasComNomeUsuario(notasDatabase)
   }
 })
+
+router.post('/notas', async ({ request }) => {
+  const { titulo, descricao, usuario } = request.body()
+  const newNota: Nota = {
+    id: notasDatabase.length + 1,
+    titulo,
+    descricao,
+    usuario,
+  }
+  notasDatabase.push(newNota)
+  return newNota
+})
