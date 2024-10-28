@@ -61,7 +61,11 @@ function getNotasComNomeUsuario(notas: Nota[]): Nota[] {
   return notasComUsuario
 }
 
-router.get('/notas', async ({ request }) => {
+router.get('/notas/:id?', async ({ request, params }) => {
+  if (params.id) {
+    const id = Number.parseInt(params.id)
+    return notasDatabase.find((nota) => nota.id === id)
+  }
   const { titulo, descricao } = request.qs()
   if (titulo && descricao) {
     let notasFiltradas = notasDatabase.filter(
@@ -77,9 +81,4 @@ router.get('/notas', async ({ request }) => {
   } else {
     return getNotasComNomeUsuario(notasDatabase)
   }
-})
-
-router.get('/:id', async ({ params }) => {
-  const id = Number.parseInt(params.id)
-  return notasDatabase.find((nota) => nota.id === id)
 })
