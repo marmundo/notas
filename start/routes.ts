@@ -61,6 +61,14 @@ function getNotasComNomeUsuario(notas: Nota[]): Nota[] {
   return notasComUsuario
 }
 
+function encontraNotaPorID(id: number): number | string {
+  const notaIndex = notasDatabase.findIndex((nota) => nota.id === id)
+  if (notaIndex === -1) {
+    return 'Nota não encontrada'
+  }
+  return notaIndex
+}
+
 router.get('/notas/:id?', async ({ request, params }) => {
   if (params.id) {
     const id = Number.parseInt(params.id)
@@ -98,11 +106,6 @@ router.put('/notas/:id', async ({ request, params }) => {
   const id = Number.parseInt(params.id)
   const { titulo, descricao, usuario } = request.body()
 
-  const notaIndex = notasDatabase.findIndex((nota) => nota.id === id)
-  if (notaIndex === -1) {
-    return 'Nota não encontrada'
-  }
-
   const updatedNota: Nota = {
     id,
     titulo,
@@ -110,7 +113,24 @@ router.put('/notas/:id', async ({ request, params }) => {
     usuario,
   }
 
+  const notaIndex = encontraNotaPorID(id)
+  if (typeof notaIndex === 'string') {
+    return notaIndex
+  }
   notasDatabase[notaIndex] = { ...notasDatabase[notaIndex], ...request.body() }
 
   return updatedNota
+})
+
+router.delete('/notas/:id', async ({ params }) => {
+  const id = Number.parseInt(params.id)
+
+  const notaIndex = encontraNotaPorID(id)
+  if (typeof notaIndex === 'string') {
+    return notaIndex
+  }
+
+  const deletedNota = notasDatabase.splice(notaIndex, 1)[0]
+
+  return deletedNota
 })
