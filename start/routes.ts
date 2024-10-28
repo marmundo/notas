@@ -15,8 +15,11 @@ Importar o controller como lazy loading é uma técnica utilizada para melhorar 
 Quando você importa um módulo usando o lazy loading, o código desse módulo só é carregado quando é realmente necessário, em vez de ser carregado imediatamente durante a inicialização da aplicação. Isso é especialmente útil quando você tem módulos grandes ou complexos que podem não ser necessários em todas as partes da aplicação.
 */
 const NotasController = () => import('#controllers/notas_controller')
+const UsuariosController = () => import('#controllers/usuarios_controller')
 import router from '@adonisjs/core/services/router'
 
 // Resource criado para o controller NotasController utilizando o comando
 // node ace make:controller posts--resource
 router.resource('notas', NotasController)
+
+router.resource('usuarios', UsuariosController)

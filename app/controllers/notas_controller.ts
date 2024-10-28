@@ -9,22 +9,6 @@ interface Nota {
   usuario: string | number
 }
 
-interface Usuario {
-  id: number
-  nome: string
-}
-
-let usuariosDatabase: Usuario[] = [
-  {
-    id: 1,
-    nome: 'Usuário 1',
-  },
-  {
-    id: 2,
-    nome: 'Usuário 2',
-  },
-]
-
 let notasDatabase: Nota[] = [
   {
     id: 1,
