@@ -94,3 +94,23 @@ router.post('/notas', async ({ request }) => {
   notasDatabase.push(newNota)
   return newNota
 })
+router.put('/notas/:id', async ({ request, params }) => {
+  const id = Number.parseInt(params.id)
+  const { titulo, descricao, usuario } = request.body()
+
+  const notaIndex = notasDatabase.findIndex((nota) => nota.id === id)
+  if (notaIndex === -1) {
+    return 'Nota não encontrada'
+  }
+
+  const updatedNota: Nota = {
+    id,
+    titulo,
+    descricao,
+    usuario,
+  }
+
+  notasDatabase[notaIndex] = { ...notasDatabase[notaIndex], ...request.body() }
+
+  return updatedNota
+})
