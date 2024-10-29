@@ -57,6 +57,7 @@ export default class UsuariosController {
     if (!usuario) {
       return 'Usuário não encontrado'
     }
-    return usuario.delete()
+    usuario.delete()
+    return usuario
   }
 }
