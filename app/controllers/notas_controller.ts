@@ -28,7 +28,7 @@ export default class NotasController {
    *
    * @returns Uma Promise que resolve com as notas contendo o nome do usuário.
    */
-  async index({}: HttpContext) {
+  async index() {
     return await Nota.all()
   }
 
