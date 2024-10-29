@@ -80,7 +80,7 @@ export default class NotasController {
       descricao,
       usuario,
     }
-    Nota.create(newNota)
+    await Nota.create(newNota)
     return newNota
   }
 
@@ -108,7 +108,7 @@ export default class NotasController {
     }
 
     notaEncontrada.merge(updatedNota)
-    notaEncontrada.save()
+    await notaEncontrada.save()
     return updatedNota
   }
 
@@ -125,6 +125,7 @@ export default class NotasController {
     if (!nota) {
       return 'Nota não encontrada'
     }
-    return nota.delete()
+    await nota.delete()
+    return nota
   }
 }
