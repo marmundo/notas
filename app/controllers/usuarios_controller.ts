@@ -20,7 +20,7 @@ export default class UsuariosController {
       id: nUsuarios + 1,
       nome,
     }
-    Usuario.create(novoUsuario)
+    await Usuario.create(novoUsuario)
     return novoUsuario
   }
 
@@ -30,7 +30,7 @@ export default class UsuariosController {
   async show({ params }: HttpContext) {
     const { id } = params
     const usuarioEncontrado = await Usuario.find(id)
-    return usuarioEncontrado ? usuarioEncontrado : 'Usuário não encontrado'
+    return usuarioEncontrado || 'Usuário não encontrado'
   }
 
   /**
@@ -44,7 +44,7 @@ export default class UsuariosController {
       return 'Usuário não encontrado'
     }
     usuarioEncontrado.merge({ nome })
-    usuarioEncontrado.save()
+    await usuarioEncontrado.save()
     return usuarioEncontrado
   }
 
@@ -57,6 +57,7 @@ export default class UsuariosController {
     if (!usuario) {
       return 'Usuário não encontrado'
     }
-    return usuario.delete()
+    await usuario.delete()
+    return usuario
   }
 }
