@@ -1,25 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
-interface Usuario {
-  id: number
-  nome: string
-}
-export let usuariosDatabase: Usuario[] = [
-  {
-    id: 1,
-    nome: 'Usuário 1',
-  },
-  {
-    id: 2,
-    nome: 'Usuário 2',
-  },
-]
+import Usuario from '#models/usuario'
 
 export default class UsuariosController {
   /**
    * Display a list of resource
    */
   async index({}: HttpContext) {
-    return usuariosDatabase
+    return await Usuario.all()
   }
 
   /**
@@ -27,11 +14,13 @@ export default class UsuariosController {
    */
   async store({ request }: HttpContext) {
     const { nome } = request.body()
-    const novoUsuario: Usuario = {
-      id: usuariosDatabase.length + 1,
+    const usuarios = await Usuario.all()
+    let nUsuarios = usuarios.length
+    const novoUsuario = {
+      id: nUsuarios + 1,
       nome,
     }
-    usuariosDatabase.push(novoUsuario)
+    Usuario.create(novoUsuario)
     return novoUsuario
   }
 
@@ -40,7 +29,7 @@ export default class UsuariosController {
    */
   async show({ params }: HttpContext) {
     const { id } = params
-    const usuarioEncontrado = usuariosDatabase.find((usuario) => usuario.id === Number(id))
+    const usuarioEncontrado = await Usuario.find(id)
     return usuarioEncontrado ? usuarioEncontrado : 'Usuário não encontrado'
   }
 
@@ -50,11 +39,12 @@ export default class UsuariosController {
   async update({ request, params }: HttpContext) {
     const { id } = params
     const { nome } = request.body()
-    const usuarioEncontrado = usuariosDatabase.find((usuario) => usuario.id === Number(id))
+    const usuarioEncontrado = await Usuario.find(id)
     if (!usuarioEncontrado) {
       return 'Usuário não encontrado'
     }
-    usuarioEncontrado.nome = nome
+    usuarioEncontrado.merge({ nome })
+    usuarioEncontrado.save()
     return usuarioEncontrado
   }
 
@@ -63,11 +53,10 @@ export default class UsuariosController {
    */
   async destroy({ params }: HttpContext) {
     const { id } = params
-    const usuarioIndex = usuariosDatabase.findIndex((usuario) => usuario.id === Number(id))
-    if (usuarioIndex === -1) {
+    const usuario = await Usuario.find(id)
+    if (!usuario) {
       return 'Usuário não encontrado'
     }
-    const usuarioRemovido = usuariosDatabase.splice(usuarioIndex, 1)
-    return usuarioRemovido
+    return usuario.delete()
   }
 }

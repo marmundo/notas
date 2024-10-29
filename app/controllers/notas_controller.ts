@@ -1,28 +1,8 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
+import Nota from '#models/nota'
+import Usuario from '#models/usuario'
 import { HttpContext } from '@adonisjs/core/http'
-
-interface Nota {
-  id: number
-  titulo: string
-  descricao: string
-  usuario: string | number
-}
-
-let notasDatabase: Nota[] = [
-  {
-    id: 1,
-    titulo: 'Nota 1',
-    descricao: 'Descrição da nota 1',
-    usuario: 1,
-  },
-  {
-    id: 2,
-    titulo: 'Nota 2',
-    descricao: 'Descrição da nota 2',
-    usuario: 2,
-  },
-]
 
 /**
  * Retorna um array de notas com o nome do usuário correspondente.
@@ -30,29 +10,16 @@ let notasDatabase: Nota[] = [
  * @param notas - O array de notas a serem processadas.
  * @returns Um novo array de notas com o nome do usuário correspondente.
  */
-function getNotasComNomeUsuario(notas: Nota[]): Nota[] {
-  console.log('getNotasComNomeUsuario')
-  let notasComUsuario = notas.map((nota: Nota) => {
-    const usuarioEncontrado = usuariosDatabase.find((usuario) => usuario.id === nota.usuario)
+function getNotasComNomeUsuario(notas: Nota[]) {
+  let notasComUsuario = notas.map(async (nota: Nota) => {
+    const usuarioEncontrado = await Usuario.find(nota.usuario)
     return {
       ...nota,
       usuario: usuarioEncontrado ? usuarioEncontrado.nome : 'Usuário não encontrado',
     }
   })
+
   return notasComUsuario
-}
-/**
- * Função que encontra uma nota pelo seu ID.
- *
- * @param id O ID da nota a ser encontrada.
- * @returns O índice da nota no array de notas ou a string 'Nota não encontrada'.
- */
-function encontraNotaPorID(id: number): number | string {
-  const notaIndex = notasDatabase.findIndex((nota) => nota.id === id)
-  if (notaIndex === -1) {
-    return 'Nota não encontrada'
-  }
-  return notaIndex
 }
 
 export default class NotasController {
@@ -62,7 +29,7 @@ export default class NotasController {
    * @returns Uma Promise que resolve com as notas contendo o nome do usuário.
    */
   async index({}: HttpContext) {
-    return getNotasComNomeUsuario(notasDatabase)
+    return await Nota.all()
   }
 
   /**
@@ -75,22 +42,26 @@ export default class NotasController {
   async show({ request, params }: HttpContext) {
     if (params.id) {
       const id = Number.parseInt(params.id)
-      return notasDatabase.find((nota) => nota.id === id)
+      return await Nota.find(id)
     }
     const { titulo, descricao } = request.qs()
     if (titulo && descricao) {
-      let notasFiltradas = notasDatabase.filter(
-        (nota) => nota.titulo.includes(titulo) && nota.descricao.includes(descricao)
-      )
+      let notasFiltradas = await Nota.findManyBy({ titulo, descricao })
       return getNotasComNomeUsuario(notasFiltradas)
     } else if (titulo) {
-      return getNotasComNomeUsuario(notasDatabase.filter((nota) => nota.titulo.includes(titulo)))
+      const notasEncontradas: Nota[] = (await Nota.findManyBy('titulo', titulo)) || []
+      if (notasEncontradas.length === 0) {
+        return 'Nota não encontrada'
+      }
+      return getNotasComNomeUsuario(notasEncontradas)
     } else if (descricao) {
-      return getNotasComNomeUsuario(
-        notasDatabase.filter((nota) => nota.descricao.includes(descricao))
-      )
+      const notasEncontradas: Nota[] = (await Nota.findManyBy('descricao', descricao)) || []
+      if (notasEncontradas.length === 0) {
+        return 'Nota não encontrada'
+      }
+      return getNotasComNomeUsuario(notasEncontradas)
     } else {
-      return getNotasComNomeUsuario(notasDatabase)
+      return getNotasComNomeUsuario(await Nota.all())
     }
   }
   /**
@@ -101,13 +72,15 @@ export default class NotasController {
    */
   async store({ request }: HttpContext) {
     const { titulo, descricao, usuario } = request.body()
-    const newNota: Nota = {
-      id: notasDatabase.length + 1,
+    const notas = await Nota.all()
+
+    const newNota = {
+      id: notas.length + 1,
       titulo,
       descricao,
       usuario,
     }
-    notasDatabase.push(newNota)
+    Nota.create(newNota)
     return newNota
   }
 
@@ -121,19 +94,21 @@ export default class NotasController {
     const id = Number.parseInt(params.id)
     const { titulo, descricao, usuario } = request.body()
 
-    const updatedNota: Nota = {
-      id,
+    const notaEncontrada = await Nota.find(id)
+
+    if (!notaEncontrada) {
+      return 'Nota não encontrada'
+    }
+
+    const updatedNota = {
+      ...notaEncontrada,
       titulo,
       descricao,
       usuario,
     }
 
-    const notaIndex = encontraNotaPorID(id)
-    if (typeof notaIndex === 'string') {
-      return notaIndex
-    }
-    notasDatabase[notaIndex] = { ...notasDatabase[notaIndex], ...request.body() }
-
+    notaEncontrada.merge(updatedNota)
+    notaEncontrada.save()
     return updatedNota
   }
 
@@ -146,13 +121,10 @@ export default class NotasController {
   async destroy({ params }: HttpContext) {
     const id = Number.parseInt(params.id)
 
-    const notaIndex = encontraNotaPorID(id)
-    if (typeof notaIndex === 'string') {
-      return notaIndex
+    const nota = await Nota.find(id)
+    if (!nota) {
+      return 'Nota não encontrada'
     }
-
-    const deletedNota = notasDatabase.splice(notaIndex, 1)[0]
-
-    return deletedNota
+    return nota.delete()
   }
 }
