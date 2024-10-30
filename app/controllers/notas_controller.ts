@@ -39,7 +39,7 @@ export default class NotasController {
    * @param params - Os parâmetros da rota.
    * @returns A nota correspondente aos parâmetros fornecidos.
    */
-  async show({ request, params }: HttpContext) {
+  async show({ request, response, params }: HttpContext) {
     if (params.id) {
       const id = Number.parseInt(params.id)
       return await Nota.find(id)
@@ -51,13 +51,13 @@ export default class NotasController {
     } else if (titulo) {
       const notasEncontradas: Nota[] = (await Nota.findManyBy('titulo', titulo)) || []
       if (notasEncontradas.length === 0) {
-        return 'Nota não encontrada'
+        return response.status(404).send('Nota não encontrada')
       }
       return getNotasComNomeUsuario(notasEncontradas)
     } else if (descricao) {
       const notasEncontradas: Nota[] = (await Nota.findManyBy('descricao', descricao)) || []
       if (notasEncontradas.length === 0) {
-        return 'Nota não encontrada'
+        return response.status(404).send('Nota não encontrada')
       }
       return getNotasComNomeUsuario(notasEncontradas)
     } else {
@@ -90,14 +90,14 @@ export default class NotasController {
    * @param {HttpContext} context - O contexto HTTP da requisição.
    * @returns {Promise<Nota | string>} - Uma promessa que resolve em uma nota atualizada ou uma string de erro.
    */
-  async update({ request, params }: HttpContext) {
+  async update({ request, params, response }: HttpContext) {
     const id = Number.parseInt(params.id)
     const { titulo, descricao, usuario } = request.body()
 
     const notaEncontrada = await Nota.find(id)
 
     if (!notaEncontrada) {
-      return 'Nota não encontrada'
+      return response.status(404).send('Nota não encontrada')
     }
 
     const updatedNota = {
@@ -118,12 +118,12 @@ export default class NotasController {
    * @param params - Os parâmetros da requisição HTTP.
    * @returns A nota excluída.
    */
-  async destroy({ params }: HttpContext) {
+  async destroy({ params, response }: HttpContext) {
     const id = Number.parseInt(params.id)
 
     const nota = await Nota.find(id)
     if (!nota) {
-      return 'Nota não encontrada'
+      return response.status(404).send('Nota não encontrada')
     }
     await nota.delete()
     return nota

@@ -5,7 +5,7 @@ export default class UsuariosController {
   /**
    * Display a list of resource
    */
-  async index({}: HttpContext) {
+  async index() {
     return await Usuario.all()
   }
 
@@ -27,21 +27,24 @@ export default class UsuariosController {
   /**
    * Show individual record
    */
-  async show({ params }: HttpContext) {
+  async show({ response, params }: HttpContext) {
     const { id } = params
     const usuarioEncontrado = await Usuario.find(id)
-    return usuarioEncontrado || 'Usuário não encontrado'
+    if (!usuarioEncontrado) {
+      return response.status(404).send('Usuário não encontrada')
+    }
+    return usuarioEncontrado
   }
 
   /**
    * Edit individual record
    */
-  async update({ request, params }: HttpContext) {
+  async update({ request, response, params }: HttpContext) {
     const { id } = params
     const { nome } = request.body()
     const usuarioEncontrado = await Usuario.find(id)
     if (!usuarioEncontrado) {
-      return 'Usuário não encontrado'
+      return response.status(404).send('Usuário não encontrada')
     }
     usuarioEncontrado.merge({ nome })
     await usuarioEncontrado.save()
@@ -51,11 +54,11 @@ export default class UsuariosController {
   /**
    * Delete record
    */
-  async destroy({ params }: HttpContext) {
+  async destroy({ response, params }: HttpContext) {
     const { id } = params
     const usuario = await Usuario.find(id)
     if (!usuario) {
-      return 'Usuário não encontrado'
+      return response.status(404).send('Usuário não encontrada')
     }
     await usuario.delete()
     return usuario
