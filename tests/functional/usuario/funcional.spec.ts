@@ -9,8 +9,6 @@ test.group('Usuario', (group) => {
     const response = await client.post(`${BASE_URL}/usuarios`).json({ nome: 'Fulano' })
     response.assertStatus(200)
     response.assertBodyContains({ nome: 'Fulano' })
-    let id = response.body().id
-    await client.delete(`${BASE_URL}/usuarios/${id}`)
   })
 
   test('listagem de usuarios', async ({ client, assert }) => {
@@ -30,7 +28,6 @@ test.group('Usuario', (group) => {
     let response = await client.put(`${BASE_URL}/usuarios/${id}`).json({ nome: 'Ciclano' })
     response.assertStatus(200)
     response.assertBodyContains({ nome: 'Ciclano' })
-    await client.delete(`${BASE_URL}/usuarios/${id}`)
   })
 
   test('delecao de usuario', async ({ client }) => {
