@@ -37,4 +37,9 @@ test.group('Usuario', (group) => {
     response.assertStatus(200)
     response.assertBodyContains({ id: id })
   })
+
+  test('delecao de usuario inexistente', async ({ client }) => {
+    const response = await client.delete(`${BASE_URL}/usuarios/1`)
+    response.assertStatus(404)
+  })
 })
