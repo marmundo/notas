@@ -49,4 +49,9 @@ test.group('Nota', (group) => {
     response.assertStatus(200)
     response.assertBodyContains({ id: id })
   })
+
+  test('delecao de nota inexistente', async ({ client }) => {
+    const response = await client.delete(`${BASE_URL}/notas/1`)
+    response.assertStatus(404)
+  })
 })
