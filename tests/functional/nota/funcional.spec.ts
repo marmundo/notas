@@ -11,8 +11,6 @@ test.group('Nota', (group) => {
       .json({ titulo: 'Nota', descricao: 'Nota' })
     response.assertStatus(200)
     response.assertBodyContains({ titulo: 'Nota' })
-    let id = response.body().id
-    await client.delete(`${BASE_URL}/notas/${id}`)
   })
 
   test('listagem de notas', async ({ client, assert }) => {
@@ -40,7 +38,6 @@ test.group('Nota', (group) => {
     let response = await client.put(`${BASE_URL}/notas/${id}`).json({ titulo: 'Nota Editada' })
     response.assertStatus(200)
     response.assertBodyContains({ titulo: 'Nota Editada' })
-    await client.delete(`${BASE_URL}/notas/${id}`)
   })
 
   test('delecao de nota', async ({ client }) => {
