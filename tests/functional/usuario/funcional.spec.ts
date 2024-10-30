@@ -1,8 +1,10 @@
+import testUtils from '@adonisjs/core/services/test_utils'
 import { test } from '@japa/runner'
 
 const BASE_URL = 'http://localhost:3333'
 
-test.group('Usuario', () => {
+test.group('Usuario', (group) => {
+  group.each.setup(() => testUtils.db().withGlobalTransaction())
   test('criacao usuario', async ({ client }) => {
     const response = await client.post(`${BASE_URL}/usuarios`).json({ nome: 'Fulano' })
     response.assertStatus(200)

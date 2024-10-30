@@ -1,8 +1,10 @@
+import testUtils from '@adonisjs/core/services/test_utils'
 import { test } from '@japa/runner'
 
 const BASE_URL = 'http://localhost:3333'
 
-test.group('Nota', () => {
+test.group('Nota', (group) => {
+  group.each.setup(() => testUtils.db().withGlobalTransaction())
   test('criacao nota', async ({ client }) => {
     const response = await client
       .post(`${BASE_URL}/notas`)
