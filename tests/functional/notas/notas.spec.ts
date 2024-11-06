@@ -16,4 +16,8 @@ test.group('Notas notas', () => {
     const resposta=await client.get('/pedroDavi')
     resposta.assertStatus(404)
   })
+
+  test('deveria criar uma nova nota', async ({ client }) => {
+    
+  })
 })
