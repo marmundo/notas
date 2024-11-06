@@ -4,7 +4,14 @@ export default class NotasController {
   /**
    * Display a list of resource
    */
-  async index({}: HttpContext) {}
+  async index({}: HttpContext) {
+    let notasDatabase=[
+        {id:1,titulo:'nota 1',conteudo:'nota 1',autor:'marcelo'},
+        {id:2,titulo:'nota 2',conteudo:'nota 1',autor:'marcelo'},
+        {id:3,titulo:'nota 3',conteudo:'nota 1',autor:'marcelo'},
+      ]
+      return notasDatabase
+  }
 
   /**
    * Display form to create a new record
