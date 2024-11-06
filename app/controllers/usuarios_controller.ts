@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
-export default class NotasController {
+export default class UsuariosController {
   /**
    * Display a list of resource
    */
