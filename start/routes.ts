@@ -19,4 +19,4 @@ import router from '@adonisjs/core/services/router'
 
 // Resource criado para o controller NotasController utilizando o comando
 // node ace make:controller posts--resource
-router.resource('notas', NotasController)
+router.resource('notas', NotasController).apiOnly()
